@@ -190,7 +190,18 @@ class BaseLogger:
 # Set up the logger
 logger = BaseLogger()
 
+# Create an importable wrapper for the logger
+from functools import wraps
 
+def log_wrap(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            logger.error(f"Exception: {e}")
+            return None
+    return wrapper
 # Q: How will i import the logger in other modules?
 # A: You can import the logger like this:
 # from backend.utils.logger import logger
