@@ -1,10 +1,13 @@
 """All NBA models are defined here."""
 import datetime
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, Boolean, Text, Date, Table, UniqueConstraint, ForeignKeyConstraint, Constraint
-from sqlalchemy.orm import relationship, backref
 
-from backend.models.base import BaseModel
+from sqlalchemy import (Boolean, Column, Constraint, Date, DateTime, Float,
+                        ForeignKey, ForeignKeyConstraint, Integer, String,
+                        Table, Text, UniqueConstraint)
+from sqlalchemy.orm import backref, relationship
+
 from backend.database.db import get_db
+from backend.models.base import BaseModel
 
 # Define the association table for the many-to-many relationship between teams and players
 team_player_association = Table(
@@ -77,13 +80,15 @@ class Player(BaseModel):
     position = Column(String)
     team_id = Column(Integer, ForeignKey("teams.id"))
     team = relationship("Team", back_populates="players")
-    games = relationship("Game", secondary=player_game_association, back_populates="players")
-    seasons = relationship("Season", secondary=player_season_association, back_populates="players")
+    games = relationship(
+        "Game", secondary=player_game_association, back_populates="players")
+    seasons = relationship(
+        "Season", secondary=player_season_association, back_populates="players")
 
 
 class Team(BaseModel):
     """NBA team model."""
-    
+
     __tablename__ = "teams"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -96,48 +101,58 @@ class Team(BaseModel):
     year_founded = Column(Integer)
     conference = Column(String)
     division = Column(String)
-    players = relationship("Player", secondary=team_player_association, back_populates="team")
-    games = relationship("Game", secondary=team_game_association, back_populates="teams")
-    seasons = relationship("Season", secondary=team_season_association, back_populates="teams")
+    players = relationship(
+        "Player", secondary=team_player_association, back_populates="team")
+    games = relationship(
+        "Game", secondary=team_game_association, back_populates="teams")
+    seasons = relationship(
+        "Season", secondary=team_season_association, back_populates="teams")
 
 
 class Game(BaseModel):
     """NBA game model."""
 
-    __tablename__ = "games"
+    __tablename__ = "games"  # type: ignore
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(DateTime, index=True)
     home_team_id = Column(Integer, ForeignKey("teams.id"))
-    home_team = relationship("Team", backref="home_games", foreign_keys=[home_team_id])
+    home_team = relationship(
+        "Team", backref="home_games", foreign_keys=[home_team_id])
     away_team_id = Column(Integer, ForeignKey("teams.id"))
-    away_team = relationship("Team", backref="away_games", foreign_keys=[away_team_id])
+    away_team = relationship(
+        "Team", backref="away_games", foreign_keys=[away_team_id])
     home_team_score = Column(Integer)
     away_team_score = Column(Integer)
     season_id = Column(Integer, ForeignKey("seasons.id"))
     season = relationship("Season", back_populates="games")
-    players = relationship("Player", secondary=player_game_association, back_populates="games")
-    teams = relationship("Team", secondary=team_game_association, back_populates="games")
+    players = relationship(
+        "Player", secondary=player_game_association, back_populates="games")
+    teams = relationship(
+        "Team", secondary=team_game_association, back_populates="games")
 
 
 class Season(BaseModel):
     """NBA season model."""
 
-    __tablename__ = "seasons"
+    __tablename__ = "seasons"  # type: ignore
 
     id = Column(Integer, primary_key=True, index=True)
     start_date = Column(Date, index=True)
     end_date = Column(Date, index=True)
     year = Column(Integer, index=True)
-    games = relationship("Game", secondary=game_season_association, back_populates="season")
-    teams = relationship("Team", secondary=team_season_association, back_populates="seasons")
-    players = relationship("Player", secondary=player_season_association, back_populates="seasons")
+    games = relationship(
+        "Game", secondary=game_season_association, back_populates="season")
+    teams = relationship(
+        "Team", secondary=team_season_association, back_populates="seasons")
+    players = relationship(
+        "Player", secondary=player_season_association, back_populates="seasons")
 
 
 class PlayerBasicStats(BaseModel):
     """NBA player basic stats model."""
 
-    __tablename__ = "player_basic_stats"
+    __tablename__ = "player_basic_stats"  # type: ignore
 
     id = Column(Integer, primary_key=True, index=True)
     player_id = Column(Integer, ForeignKey("players.id"))
@@ -169,7 +184,7 @@ class PlayerBasicStats(BaseModel):
 class PlayerAdvancedStats(BaseModel):
     """NBA player advanced stats model."""
 
-    __tablename__ = "player_advanced_stats"
+    __tablename__ = "player_advanced_stats"  # type: ignore
 
     id = Column(Integer, primary_key=True, index=True)
     player_id = Column(Integer, ForeignKey("players.id"))
@@ -201,7 +216,7 @@ class PlayerAdvancedStats(BaseModel):
 class PlayerShootingStats(BaseModel):
     """NBA player shooting stats model."""
 
-    __tablename__ = "player_shooting_stats"
+    __tablename__ = "player_shooting_stats"  # type: ignore
 
     id = Column(Integer, primary_key=True, index=True)
     player_id = Column(Integer, ForeignKey("players.id"))
@@ -225,4 +240,4 @@ class PlayerShootingStats(BaseModel):
     free_throw_percentage = Column(Float)
     free_throws_assisted_percentage = Column(Float)
     free_throws_dunk_percentage = Column(Float)
-    free_throws_layup_percentage = Column(Float)                                                                                                                                                                                                                                                  
+    free_throws_layup_percentage = Column(Float)
